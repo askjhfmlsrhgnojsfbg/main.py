@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 import time
 
+# Lấy API KEY từ GitHub Secrets
 API_KEY = os.getenv("SERPAPI_KEY") 
 SEARCH_QUERY = "Thác Dải Yếm"
 MAX_PAGES = 5
@@ -16,8 +17,8 @@ def get_reviews():
     search_params = {"engine": "google_maps", "q": SEARCH_QUERY, "api_key": API_KEY, "hl": "vi"}
     
     try:
-        search_data = requests.get("https://serpapi.com/search", params=search_params).json()
-        data_id = search_data.get("place_results", {}).get("data_id") or search_data.get("local_results", [{}])[0].get("data_id")
+        response = requests.get("https://serpapi.com/search", params=search_params).json()
+        data_id = response.get("place_results", {}).get("data_id") or response.get("local_results", [{}])[0].get("data_id")
 
         if not data_id:
             print("Không tìm thấy mã địa điểm!")
@@ -35,17 +36,16 @@ def get_reviews():
                 "hl": "vi",
                 "next_page_token": next_page_token
             }
-            response = requests.get("https://serpapi.com/search", params=review_params).json()
-            current_reviews = response.get("reviews", [])
-            if not current_reviews: break
-            all_reviews.extend(current_reviews)
-            next_page_token = response.get("serpapi_pagination", {}).get("next_page_token")
+            res = requests.get("https://serpapi.com/search", params=review_params).json()
+            reviews = res.get("reviews", [])
+            if not reviews: break
+            all_reviews.extend(reviews)
+            next_page_token = res.get("serpapi_pagination", {}).get("next_page_token")
             if not next_page_token: break
             time.sleep(1)
 
         if all_reviews:
             df = pd.DataFrame(all_reviews)
-            # Chỉ lấy các cột cần thiết nếu chúng tồn tại
             cols = [c for c in ['user', 'rating', 'snippet', 'date'] if c in df.columns]
             df[cols].to_excel("du_lieu_binh_luan.xlsx", index=False)
             print(f"Thành công! Đã lấy {len(all_reviews)} bình luận.")

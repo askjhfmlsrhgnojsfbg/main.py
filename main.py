@@ -4,7 +4,7 @@ import pandas as pd
 import time
 
 # 1. LẤY API KEY TỪ HỆ THỐNG BẢO MẬT CỦA GITHUB
-API_KEY = os.getenv("e92056bfd79151633a516cbe91c9f91afb54f8994cb4b70c9c7079b9f9c16fd1") 
+API_KEY = os.getenv("SERPAPI_KEY")
 SEARCH_QUERY = "Thác Dải Yếm"
 MAX_PAGES = 3 # Lấy khoảng 30 bình luận mỗi lần chạy để tiết kiệm lượt dùng
 

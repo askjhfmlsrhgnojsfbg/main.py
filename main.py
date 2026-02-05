@@ -3,10 +3,9 @@ import requests
 import pandas as pd
 import time
 
-# CHỈ SỬA DÒNG NÀY: Dùng đúng tên "SERPAPI_KEY" để gọi từ kho lưu trữ bí mật của GitHub
 API_KEY = os.getenv("SERPAPI_KEY") 
 SEARCH_QUERY = "Thác Dải Yếm"
-MAX_PAGES = 3 
+MAX_PAGES = 5
 
 def get_reviews():
     if not API_KEY:

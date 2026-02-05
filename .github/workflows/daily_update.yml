@@ -1,4 +1,4 @@
-name: Tự động cập nhật dữ liệu TikTok
+name: Tự động cập nhật dữ liệu Google Map
 
 on:
   schedule:

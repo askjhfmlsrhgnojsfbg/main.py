@@ -2,18 +2,22 @@ name: Tự động cập nhật dữ liệu Google Map
 
 on:
   schedule:
-    - cron: '0 1 * * *' # Chạy vào 1h sáng mỗi ngày (giờ UTC, khoảng 8h sáng VN)
-  workflow_dispatch: # Cho phép bạn bấm nút chạy thủ công nếu muốn
+    - cron: '0 1 * * *' # Chạy vào 1h sáng mỗi ngày (giờ UTC)
+  workflow_dispatch: # Cho phép bấm nút chạy thủ công
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    # THÊM DÒNG NÀY: Cấp quyền ghi để robot có thể push file Excel
+    permissions:
+      contents: write 
+
     steps:
       - name: Kiểm tra mã nguồn
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4 # Cập nhật bản v4 mới nhất
 
       - name: Cài đặt Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
@@ -22,13 +26,15 @@ jobs:
 
       - name: Chạy code lấy dữ liệu
         env:
-          MY_API_KEY: ${{ secrets.SERPAPI_KEY }} # Bảo mật mã API của bạn
+          # PHẢI ĐỔI TÊN Ở ĐÂY: Cho khớp với os.getenv("SERPAPI_KEY") trong main.py
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }} 
         run: python main.py
 
       - name: Lưu file kết quả lên GitHub
         run: |
-          git config --global user.name 'Github Action'
-          git config --global user.email 'action@github.com'
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add *.xlsx
-          git commit -m "Auto update data"
-          git push
+          # Kiểm tra nếu có thay đổi thì mới commit, tránh báo lỗi khi không có gì mới
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto update data: $(date)" && git push)
+          
